@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+
+package com.example.agenthotelgrpc.proto;
+
+
+/**
+ ****  Consultation ****
+ */
+
+
+message GetOffresRequest {
+    int32 idAgence = 1;
+    string dateDebut = 2;
+    string dateFin = 3;
+    string ville = 4;
+    int32 nbPersonnes = 5;
+    int32 nbEtoiles = 6;
+}
+
+message GetOffresHotelRequest {
+    int32 idHotel = 1;
+    int32 idAgence = 2;
+    string dateDebut = 3;
+    string dateFin = 4;
+    int32 nbPersonnes = 5;
+
+}
+
+message OffreDTO {
+    int32 idOffre = 1;
+    int32 idHotel = 2;
+    string nomHotel = 3;
+    string ville = 4;
+    string dateDebut = 5;
+    string dateFin = 6;
+    int32 nbPersonnes = 7;
+    double prix = 8;
+    int32 nbEtoiles = 9;
+    double pourcentageReduction = 10;
+    bytes image = 11;
+}
+
+message GetOffresResponse {
+    repeated OffreDTO offres = 1;
+}
+
+/**
+ ****  Authentification ****
+ */
+
+message AuthentifierRequest {
+    //int32 idHotel = 1;
+    int32 idAgence = 1;
+    string password = 2;
+}
+
+message AuthentifierHotelRequest {
+    int32 idHotel = 1;
+    int32 idAgence = 2;
+    string password = 3;
+}
+
+message AuthentifierResponse {
+    bool authentifie = 1;
+}
+
+/**
+ ****  Reservation ****
+ */
+
+message ReservationHotelRequest {
+
+    int32 idHotel = 1;
+    int32 idAgence = 2;
+    int32 idOffre = 3;
+    string dateDebut = 4;
+    string dateFin = 5;
+    string nomClient = 6;
+    string prenomClient = 7;
+    string emailClient = 8;
+    int32 nbPersonnes = 9;
+
+}
+
+
+message PossibleRequest{
+    int32 idOffre = 1;
+    int32 idAgence = 2;
+    string dateDebut = 3;
+    string dateFin = 4;
+    int32 nbPersonnes = 5;
+
+}
+
+message PossibleResponse{
+    bool possible = 1;
+}
+
+
+
+message ReservationRequest {
+    int32 idOffre = 1;
+    int32 idAgence = 2;
+    string nomClient = 3;
+    string prenomClient = 4;
+    string dateDebut = 5;
+    string dateFin = 6;
+    string emailClient = 7;
+    int64 numeroCarte = 8;
+    string dateExpiration = 9;
+    int32 cryptogramme = 10;
+    int32 nbPersonnes = 11;
+}
+
+
+
+message ReservationDTO {
+
+    int32 idReservation = 1;
+    string nomHotel = 2;
+    string ville = 3;
+    string dateDebut = 4;
+    string dateFin = 5;
+    string nomClient = 6;
+    string prenomClient = 7;
+    string emailClient = 8;
+    double prix = 9;
+
+}
+
+message ReservationResponse {
+    bool reserve = 1;
+    int32 idHotel = 2;
+    ReservationDTO reservation = 3;
+}
+
+/**
+ ****  Comparateur ****
+ */
+
+message ComparateurRequest {
+    string dateDebut = 1;
+    string dateFin = 2;
+    int32 nbPersonnes = 3;
+    string ville = 4;
+    int32 nbEtoiles = 5;
+}
+
+message ComparateurAgenceRequest {
+    int32 idAgence = 1;
+    string dateDebut = 2;
+    string dateFin = 3;
+    int32 nbPersonnes = 4;
+    string ville = 5;
+    int32 nbEtoiles = 6;
+}
+
+message ComparateurHotelRequest {
+    int32 idAgence =1;
+    int32 idHotel = 2;
+    string dateDebut = 3;
+    string dateFin = 4;
+    int32 nbPersonnes = 5;
+}
+
+message OffreComparateurDTO{
+    string nomHotel =1;
+    string nomAgence =2;
+    string adresseAgence =3;
+    string AdresseHotel =4;
+    int32 nbEtoiles =5;
+    int32 nbLitsDisponibles =6;
+    double prix =7;
+    double pourcentageReduction =8;
+}
+
+
+message ComparateurResponse {
+    repeated OffreComparateurDTO offres = 1;
+}
+
+
+// un peu de duplication ici mais chaque service fait un travail propre a lui
+// client -> agence -> hotels partenaires
+
+service AgenceService {
+    rpc authentifier (AuthentifierRequest) returns (AuthentifierResponse);
+    rpc reserver (ReservationRequest) returns (ReservationResponse);
+    rpc getOffres (GetOffresRequest) returns (GetOffresResponse);
+    rpc possible (PossibleRequest) returns (PossibleResponse);
+    rpc compare (stream ComparateurAgenceRequest) returns (ComparateurResponse); // appelle getoffres
+}
+
+
+service HotelService {
+    rpc getOffres (stream GetOffresHotelRequest) returns (GetOffresResponse);
+    rpc authentifier (stream AuthentifierHotelRequest) returns (AuthentifierResponse);
+    rpc possible (PossibleRequest) returns (PossibleResponse);
+    rpc reserver (ReservationHotelRequest) returns (ReservationResponse);
+    rpc compare (stream ComparateurHotelRequest) returns (ComparateurResponse); // reçoit plusieurs appels getoffres
+}
+
+service ComparateurService{
+    rpc compare(ComparateurRequest) returns (ComparateurResponse);
+}
+
+
+

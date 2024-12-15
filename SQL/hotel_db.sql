@@ -1,0 +1,89 @@
+
+/*
+DROP DATABASE hotel_db_2;
+CREATE DATABASE hotel_db_2;
+
+*/
+
+USE hotel_db_2;
+
+-- nettoyage des tables 
+
+-- Nettoyage des tables
+
+-- Désactiver les contraintes de clé étrangère
+SET foreign_key_checks = 0;
+
+-- Nettoyage des tables
+TRUNCATE TABLE carte_bancaire;
+TRUNCATE TABLE hotel_client;
+TRUNCATE TABLE hotel_agence;
+TRUNCATE TABLE agence_hotel;
+TRUNCATE TABLE offre;
+TRUNCATE TABLE chambre;
+TRUNCATE TABLE hotel;
+TRUNCATE TABLE agence;
+TRUNCATE TABLE client;
+TRUNCATE TABLE adresse;
+
+-- Réactiver les contraintes de clé étrangère
+SET foreign_key_checks = 1;
+
+-- Insertion des adresses
+INSERT INTO adresse (pays, ville, nom_rue, numero_rue) VALUES 
+('France', 'Paris', 'Champs-Élysées', 101),
+('France', 'Marseille', 'Rue de la République', 50),
+('France', 'Paris', 'Avenue George V', 101),
+('France', 'Marseille', 'Vieux Port', 50);
+
+-- Insertion des agences
+INSERT INTO agence (nom, password, adresse_id) VALUES 
+('Agence Parisienne', 'password123', 1),
+('Agence Marseillaise', 'password456', 2);
+
+-- Insertion des hôtels
+INSERT INTO hotel (nom, adresse_id, nb_etoiles, nb_lits_disponibles) VALUES 
+('Hôtel de Paris', 3, 4, 50),
+('Hôtel de Marseille', 4, 3, 30);
+
+-- Insertion des chambres
+INSERT INTO chambre (nb_personnes, prix, hotel_id) VALUES 
+(2, 150.0, 1),
+(3, 200.0, 1),
+(1, 100.0, 1),
+(2, 100.0, 2);
+
+-- Insertion des clients
+INSERT INTO client (nom, prenom, email) VALUES 
+('Dupont', 'Jean', 'jean.dupont@example.com');
+
+-- Insertion des cartes bancaires
+INSERT INTO carte_bancaire (numero, cvv, date_expiration, client_id) VALUES 
+(1234567890123456, 123, '12/24', 1),
+(9876543210123456, 456, '10/25', 1);
+
+-- Insertion des offres
+INSERT INTO offre (date_debut_offre, date_fin_offre, type_chambre, pourcentage_reduction, hotel_id, agence_id) VALUES
+('2024-11-01', '2024-12-31', 2, 10.0, 1, 1),
+('2024-11-01', '2024-12-31', 2, 20.0, 1, 2),
+('2024-11-01', '2024-12-31', 1, 10.0, 1, 1),
+('2024-11-01', '2024-12-31', 2, 10.0, 2, 1);
+
+-- Insertion des associations entre hôtels et clients
+INSERT INTO hotel_client (hotel_id, client_id) VALUES 
+(1, 1);
+
+-- Insertion des associations entre hôtels et agences partenaires
+INSERT INTO hotel_agence (hotel_id, agence_id) VALUES 
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 2);
+
+-- Insertion des associations entre agences et hôtels partenaires
+INSERT INTO agence_hotel (agence_id, hotel_id) VALUES 
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 2);
+
